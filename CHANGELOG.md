@@ -1,5 +1,27 @@
-# 1.14.1 (Unreleased)
+# 1.14.5 (Unreleased)
 
+
+# 1.14.4 (March 20, 2024)
+
+* `msgpack`: Now uses string encoding instead of float encoding for a whole number that is too large to fit in any of MessagePack's integer types.
+* `function/stdlib`: Type conversion functions (constructed with `MakeToFunc`) can now convert null values of unknown type into null values of the target type, rather than returning an unknown value in that case.
+* `json`: Will now correctly reject attempts to encode `cty.DynamicVal`, whereas before it would just produce an invalid JSON document without any error. (This is invalid because JSON encoding cannot support unknown values at all; `cty.DynamicVal` is a special case of unknown value where even the _type_ isn't known.)
+
+# 1.14.3 (February 29, 2024)
+
+* `msgpack`: Fixed edge-case bug that could cause loss of floating point precision when round-tripping due to incorrectly using a MessagePack integer to represent a large non-integral number. [#176](https://github.com/zclconf/go-cty/pull/176)
+* `cty`: Fixed some false-negative numeric equality test results by comparing numbers as integers when possible. [#176](https://github.com/zclconf/go-cty/pull/176)
+
+# 1.14.2 (January 23, 2024)
+
+* `convert`: Converting from an unknown map value to an object type now correctly handles the situation where the map element type disagrees with an _optional_ attribute of the target type, since when a map value is unknown we don't yet know which keys it has and thus cannot predict what subset of the elements will get converted as attributes in the resulting object. ([#175](https://github.com/zclconf/go-cty/pull/175))
+
+# 1.14.1 (October 5, 2023)
+
+* `cty`: It's now valid to use the `Refine` method on `cty.DynamicVal`, although all refinements will be silently discarded. This replaces the original behavior of panicking when trying to refine `cty.DynamicVal`.
+* `cty`: `Value.Range` will now return a clearer panic message if called on a marked value. The "value range" concept is only applicable to unmarked values because not all of the `ValueRange` functions are able to propagate marks into their return values, due to returning Go primitive types instead of new `cty.Value` results.
+
+    Callers that use marks must, as usual, take care to unmark them before exporting values into "normal" Go types, and then explicitly re-apply the marks to their result as appropriate. Applications that make no use of value marks, and library callers that exclude marked values from what they support, can safely ignore this requirement.
 
 # 1.14.0 (August 30, 2023)
 
